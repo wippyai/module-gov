@@ -1,0 +1,42 @@
+version: "1.0"
+namespace: wippy.gov.observer
+
+entries:
+  # wippy.gov.observer:changeset
+  - name: changeset
+    kind: function.lua
+    meta:
+      type: registry.listener
+      comment: Registry changeset observer
+      description: A lightweight listener that logs basic information about registry changes
+      depends_on:
+        - ns:registry
+    source: file://changeset.lua
+    modules:
+      - registry
+      - json
+      - time
+      - logger
+    method: run
+    
+  # wippy.gov.observer:entry_change_notifier
+  - name: entry_change_notifier
+    kind: function.lua
+    meta:
+      version: 1.0.6
+      type: registry.listener
+      comment: Registry listener that notifies wippy.central about entry changes (v1.0.6)
+      description: Detects changes to specific entry types and publishes notifications to wippy.central with properly formatted timestamps
+      depends_on:
+        - ns:registry
+        - ns:logger
+        - ns:json
+        - ns:time
+      priority: 50
+    source: file://entry_change_notifier.lua
+    modules:
+      - json
+      - logger
+      - time
+    method: run
+    

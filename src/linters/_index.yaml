@@ -1,0 +1,93 @@
+version: "1.0"
+namespace: wippy.gov.linters
+
+entries:
+  # wippy.gov.linters:empty_deps_cleaner
+  - name: empty_deps_cleaner
+    kind: function.lua
+    meta:
+      type: registry.processor
+      comment: Empty dependencies cleaner
+      description: Removes empty modules and imports arrays/tables by setting them to nil
+      priority: 5010
+    source: file://empty_deps_cleaner.lua
+    modules:
+      - logger
+      - json
+    method: run
+    
+  # wippy.gov.linters:kinds_linter
+  - name: kinds_linter
+    kind: function.lua
+    meta:
+      type: registry.processor
+      comment: Entry kind validator
+      description: Validates that all entries have a known kind type, failing with detailed errors for invalid entries
+      priority: 100
+    source: file://kinds_linter.lua
+    modules:
+      - logger
+      - json
+    method: run
+    
+  # wippy.gov.linters:lua_dependency_lib
+  - name: lua_dependency_lib
+    kind: library.lua
+    meta:
+      type: registry.library
+      comment: Dependency resolution library for Lua code
+      description: A library for analyzing and resolving module and import dependencies in Lua code, with support for alias generation and dependency categorization.
+    source: file://lua_dependency_lib.lua
+    modules:
+      - logger
+      - registry
+    
+  # wippy.gov.linters:lua_dependency_manager
+  - name: lua_dependency_manager
+    kind: function.lua
+    meta:
+      type: registry.processor
+      comment: Dependency inspector for Lua code entries
+      description: A follow-up processor that takes the output of lua_pre_processor, analyzes dependencies, and enriches entries with resolved dependency information.
+      priority: 500
+    source: file://lua_dependency_manager.lua
+    modules:
+      - logger
+      - json
+    imports:
+      lua_dependency_lib: wippy.gov.linters:lua_dependency_lib
+    method: run
+    
+  # wippy.gov.linters:lua_pre_processor
+  - name: lua_pre_processor
+    kind: function.lua
+    meta:
+      type: registry.processor
+      comment: Basic linting pre-processor for function libraries and processes
+      description: A lightweight pre-processor that validates and logs source information for function.lua and process.lua entries. Will be extended with dependency fetching and AST validation.
+      depends_on:
+        - ns:registry
+        - ns:logger
+      priority: 0
+    source: file://lua_pre_processor.lua
+    modules:
+      - logger
+      - json
+      - treesitter
+    method: run
+    
+  # wippy.gov.linters:method_linter
+  - name: method_linter
+    kind: function.lua
+    meta:
+      type: registry.processor
+      comment: Method validator for function.lua entries
+      description: Validates that function.lua entries have a method specified or tries to determine it from the return statement using Tree-sitter
+      priority: 5000
+    source: file://method_linter.lua
+    modules:
+      - logger
+      - json
+      - treesitter
+    method: run
+    

@@ -1,2 +1,68 @@
-version: "1.0.0"
-namespace: wippy
+version: "1.0"
+namespace: wippy.gov
+
+entries:
+  # wippy.gov:client
+  - name: client
+    kind: library.lua
+    meta:
+      comment: Registry governance client library
+      description: Client interface for interacting with the registry governance process
+    source: file://client.lua
+    modules:
+      - json
+      - time
+      - uuid
+      - security
+      - logger
+    
+  # wippy.gov:gov.spec
+  - name: wippy.gov.spec
+    kind: registry.entry
+    meta:
+      type: module.spec
+      comment: Registry governance system for managing registry operations with validation, processing pipelines, and extension points
+      tags:
+        - registry
+        - governance
+        - validation
+        - processing
+        - extensions
+    source: file://gov.spec.md
+    
+  # wippy.gov:process
+  - name: process
+    kind: process.lua
+    meta:
+      comment: Registry governance control process
+      description: Centralized controller for all registry operations
+    source: file://process.lua
+    modules:
+      - json
+      - registry
+      - time
+      - uuid
+      - logger
+      - env
+    imports:
+      actor: wippy.actor:actor
+    method: run
+    
+  # wippy.gov:process.service
+  - name: process.service
+    kind: process.service
+    meta:
+      comment: Registry governance service
+      description: Always-running service for registry governance
+    host: app:processes
+    lifecycle:
+      depends_on:
+        - app:processes
+      auto_start: true
+      security:
+        actor:
+          id: root
+        groups:
+          - app.security:root
+    process: process
+    

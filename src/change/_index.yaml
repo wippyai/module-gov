@@ -1,0 +1,109 @@
+version: "1.0"
+namespace: wippy.gov.change
+
+entries:
+  # wippy.gov.change:executor
+  - name: executor
+    kind: process.lua
+    meta:
+      comment: Registry change executor
+      description: Applies changes or a specific version to the registry
+      depends_on:
+        - ns:registry
+      default_host: app:processes
+    source: file://executor.lua
+    modules:
+      - registry
+      - json
+      - time
+      - logger
+    method: run
+    
+  # wippy.gov.change:listener_registry
+  - name: listener_registry
+    kind: library.lua
+    meta:
+      comment: Registry change listener management
+      description: Manages post-processing hooks that are executed after registry changes
+      depends_on:
+        - ns:registry
+    source: file://listener_registry.lua
+    modules:
+      - registry
+      - json
+      - funcs
+      - logger
+    
+  # wippy.gov.change:post_processor
+  - name: post_processor
+    kind: process.lua
+    meta:
+      comment: Registry change post-processor
+      description: Performs post-execution tasks like metrics collection and notifications
+      depends_on:
+        - ns:registry
+      default_host: app:processes
+    source: file://post_processor.lua
+    modules:
+      - registry
+      - json
+      - time
+      - logger
+    imports:
+      listener_registry: wippy.gov.change:listener_registry
+      processor_registry: wippy.gov.change:processor_registry
+    method: run
+    
+  # wippy.gov.change:pre_processor
+  - name: pre_processor
+    kind: process.lua
+    meta:
+      comment: Registry change pre-processor
+      description: Validates operations or version before execution
+      depends_on:
+        - ns:registry
+      default_host: app:processes
+    source: file://pre_processor.lua
+    modules:
+      - registry
+      - json
+      - time
+      - logger
+    imports:
+      listener_registry: wippy.gov.change:listener_registry
+      processor_registry: wippy.gov.change:processor_registry
+    method: run
+    
+  # wippy.gov.change:process
+  - name: process
+    kind: process.lua
+    meta:
+      comment: Registry change coordinator process
+      description: Coordinates pre-processor, executor, and post-processor sub-processes
+      depends_on:
+        - ns:registry
+        - wippy.gov:client
+    source: file://process.lua
+    modules:
+      - registry
+      - json
+      - time
+      - logger
+      - funcs
+    method: run
+    
+  # wippy.gov.change:processor_registry
+  - name: processor_registry
+    kind: library.lua
+    meta:
+      comment: Registry change processor management
+      description: Manages pre-processing hooks that validate and transform registry operations
+      depends_on:
+        - ns:registry
+    source: file://processor_registry.lua
+    modules:
+      - registry
+      - json
+      - funcs
+      - logger
+    

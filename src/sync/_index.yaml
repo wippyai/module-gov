@@ -1,0 +1,69 @@
+version: "1.0"
+namespace: wippy.gov.sync
+
+entries:
+  # wippy.gov.sync:downloader
+  - name: downloader
+    kind: library.lua
+    meta:
+      comment: Registry to filesystem synchronization
+      description: Provides functions for exporting registry entries to filesystem
+      depends_on:
+        - ns:registry
+        - ns:fs
+    source: file://downloader.lua
+    modules:
+      - registry
+      - json
+      - fs
+      - yaml
+      - env
+    
+  # wippy.gov.sync:downloader.process
+  - name: downloader.process
+    kind: process.lua
+    meta:
+      comment: Registry downloader process
+      description: Process for downloading registry entries to filesystem
+      depends_on:
+        - wippy.gov.sync:downloader
+    source: file://downloader.process.lua
+    modules:
+      - json
+      - logger
+    imports:
+      downloader: wippy.gov.sync:downloader
+    method: run
+    
+  # wippy.gov.sync:uploader
+  - name: uploader
+    kind: library.lua
+    meta:
+      comment: Filesystem to registry synchronization
+      description: Provides functions for importing filesystem entries to registry
+      depends_on:
+        - ns:registry
+        - ns:fs
+    source: file://uploader.lua
+    modules:
+      - registry
+      - json
+      - loader
+      - env
+    
+  # wippy.gov.sync:uploader.process
+  - name: uploader.process
+    kind: process.lua
+    meta:
+      comment: Registry uploader process
+      description: Process for uploading filesystem entries to registry
+      depends_on:
+        - wippy.gov.sync:uploader
+    source: file://uploader.process.lua
+    modules:
+      - json
+      - logger
+    imports:
+      uploader: wippy.gov.sync:uploader
+    method: run
+    
