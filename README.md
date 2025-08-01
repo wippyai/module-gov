@@ -15,7 +15,7 @@
 
 </div>
 
-The Registry Governance system provides a centralized architecture for managing registry operations in the Wippy Runtime environment.
+The Registry Governance system provides a centralized architecture for managing registry operations in the Wippy Runtime environment with validation, processing pipelines, and extension points.
 It ensures data consistency, validation, and provides hooks for preprocessing and postprocessing of registry changes.
 
 [wippy-documentation]: https://docs.wippy.ai
